@@ -9,20 +9,51 @@ class App extends Component{
   constructor(props){
     super(props)
     this.state = {}
-    this.state.log = "bleh"
+    this.state.upcoming_log = "bleh"
+    this.state.results_log = "blah"
   }
 
-  componentDidMount(){
-    //TODO separate README file from data get
-    console.log("CALL: componentDidMount")
-    fetch("./2019-07-29-load_results.py.log")
-      .then(response=>response.text())
-      .then(log=>this.setState({'log':log}))
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+
+
+  componentDidMount(){
+    var today = new Date();
+    var dd = today.getDate();
+
+    var mm = today.getMonth()+1;
+    var yyyy = today.getFullYear();
+    if(dd<10)
+    {
+        dd='0'+dd;
+    }
+
+    if(mm<10)
+    {
+        mm='0'+mm;
+    }
+    today = yyyy + '-'+mm+'-'+dd;
+    console.log(today);
+    //TODO separate README file from data get
+    fetch("./" + today + '-load_upcoming.py.log')
+      .then(response=>response.text())
+      .then(log=>this.setState({'upcoming_log':log}))
+    fetch("./" + today + '-load_results.py.log')
+      .then(response=>response.text())
+      .then(log=>this.setState({'results_log':log}))
+    this.interval = setInterval(() => this.setState({ time: Date.now() }), 10000);
   }
 
   render(){
-    console.log(this.state)
+    let formatted_upcoming_log = this.state.upcoming_log.split('\n').reverse().map(i => {
+      return <p>{i}</p>
+    });
+    let formatted_results_log = this.state.results_log.split('\n').reverse().map(i => {
+      return <p>{i}</p>
+    });
     return (
       <div className="App">
         <Container fluid>
@@ -30,27 +61,21 @@ class App extends Component{
             <h1>CSGO Match Database Builder</h1>
           </Jumbotron>
           <Row>
-            <Col>
+            <Col className="log_column" md={6}>
               <Card>
-                <Card.Body>matches count(): 60, groups count(): 120,  players count(): 600, </Card.Body>
+                <Card.Body><h4>load_results.py</h4></Card.Body>
               </Card>
-              <Card>
-                <Card.Body>Alert goes here: there are {10} Orphaned players</Card.Body>
-              </Card>
+              <div>
+                {formatted_results_log}
+              </div>
             </Col>
-          </Row>
-          <Row>
-            <Col>
+            <Col className="log_column" md={{ span: 6, offset: 6}}>
               <Card>
-                <Card.Body>load_results.py</Card.Body>
+                <Card.Body><h4>load_upcoming.py</h4></Card.Body>
               </Card>
-              <p>{this.state.log}</p>
-            </Col>
-            <Col>
-            <Card>
-              <Card.Body>load_upcoming.py</Card.Body>
-            </Card>
-              <p>{this.state.log}</p>
+              <div>
+                {formatted_upcoming_log}
+              </div>
             </Col>
           </Row>
         </Container>

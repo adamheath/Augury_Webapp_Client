@@ -1,3 +1,15 @@
+.log_column{
+  text-align: left;
+  position:absolute;
+  overflow-y: scroll;
+  height:100%;
+}
+body, html {
+  margin: 0;
+  overflow: hidden;
+  height:100%;
+}
+
 .App {
   text-align: center;
 }
