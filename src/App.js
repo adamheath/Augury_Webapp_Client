@@ -15,7 +15,7 @@ class App extends Component{
   componentDidMount(){
     //TODO separate README file from data get
     console.log("CALL: componentDidMount")
-    fetch("./logs/log.log")
+    fetch("./2019-07-29-load_results.py.log")
       .then(response=>response.text())
       .then(log=>this.setState({'log':log}))
 
