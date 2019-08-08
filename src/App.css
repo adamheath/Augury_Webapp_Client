@@ -4,6 +4,24 @@
   overflow-y: scroll;
   height:100%;
 }
+.error{
+  text-align:left;
+}
+.metadata_list{
+
+}
+.metadata_list_item{
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+}
+.list_content{
+  align-self: flex-end;
+}
+.list_title{
+  align-self: flex-start;
+}
+
 body, html {
   margin: 0;
   overflow: hidden;

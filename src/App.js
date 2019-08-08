@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Button, Jumbotron, Container, Row, Col, Alert, Card } from 'react-bootstrap';
+import { Button, Jumbotron, Container, Row, Col, Alert, Card, ListGroup } from 'react-bootstrap';
 import logo from './logo.svg';
 import './App.css';
 var fs = require('fs');
@@ -9,6 +9,8 @@ class App extends Component{
   constructor(props){
     super(props)
     this.state = {}
+    this.state.metadata = {}
+    this.state.time =''
     this.state.upcoming_log = "bleh"
     this.state.results_log = "blah"
   }
@@ -44,7 +46,39 @@ class App extends Component{
     fetch("./" + today + '-load_results.py.log')
       .then(response=>response.text())
       .then(log=>this.setState({'results_log':log}))
-    this.interval = setInterval(() => this.setState({ time: Date.now() }), 10000);
+    fetch("./metadata.json")
+      .then(response=>response.json())
+      .then(metadata=>this.setState({'metadata':metadata}))
+
+    this.interval = setInterval(() => this.setState({ time: Date.now() }), 1000);
+    console.log(this.state.time)
+  }
+
+  orphanedAlert(){
+    if(parseInt(this.state.metadata['orphaned_groups']) > 0 || parseInt(this.state.metadata['orphaned_players']) > 0){
+      return(<Alert className='error' variant={'warning'}>
+              <ul>
+                <li>Orphaned Groups: {this.state.metadata['orphaned_groups']}</li>
+                <li>Orphaned Players: {this.state.metadata['orphaned_players']}</li>
+              </ul>
+            </Alert>)
+    }
+  }
+  metadata(){
+    if(this.state.metadata != {}){
+      return(
+        <ListGroup className='metadata_list'>
+          <ListGroup.Item className="metadata_list_item"><div className='list_title'>augury.matches_complete count: </div><div className='list_content'>{this.state.metadata.matches_complete_count}</div></ListGroup.Item>
+          <ListGroup.Item className="metadata_list_item"><div className='list_title'>augury.groups count: </div><div className='list_content'>{this.state.metadata.groups_count}</div></ListGroup.Item>
+          <ListGroup.Item className="metadata_list_item"><div className='list_title'>augury.players count: </div><div className='list_content'>{this.state.metadata.players_count}</div></ListGroup.Item>
+          <ListGroup.Item className="metadata_list_item"><div className='list_title'>augury.matches count: </div><div className='list_content'>{this.state.metadata.matches_count}</div></ListGroup.Item>
+        </ListGroup>
+      )
+    }else{
+      return(
+        "Loading"
+      )
+    }
   }
 
   render(){
@@ -59,6 +93,8 @@ class App extends Component{
         <Container fluid>
           <Jumbotron className='title-jumbo'>
             <h1>CSGO Match Database Builder</h1>
+            {this.metadata()}
+            {this.orphanedAlert()}
           </Jumbotron>
           <Row>
             <Col className="log_column" md={6}>
